@@ -19,5 +19,8 @@ kubectl apply -f .infrastructure/app/deployment.yml
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 # kubectl apply -f .infrastructure/ingress/ingress.yml
 
-# Add taints for specified nodes
-kubectl taint nodes todoapp-cluster-worker todoapp-cluster-worker2 app=mysql:NoSchedule
+# Select all nodes with label app=mysql and apply the taint
+for node in $(kubectl get nodes -l app=mysql -o jsonpath='{.items[*].metadata.name}'); do
+  kubectl taint nodes "$node" app=mysql:NoSchedule --overwrite
+done
+
